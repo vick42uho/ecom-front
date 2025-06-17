@@ -232,14 +232,14 @@ export default function Cart() {
                       <td className="p-4 text-right">
                         <div className="flex items-center justify-end gap-2">
                           <button
-                            onClick={(e) => downQty(cart.id)}
+                            onClick={() => { downQty(cart.id) }}
                             className="bg-gray-200 text-gray-700 px-3 py-1 rounded-full hover:bg-gray-300 transition-colors duration-200"
                           >
                             <i className="fa fa-minus"></i>
                           </button>
                           <span className="font-medium">{cart.qty}</span>
                           <button
-                            onClick={(e) => upQty(cart.id)}
+                            onClick={() => { upQty(cart.id) }}
                             className="bg-gray-200 text-gray-700 px-3 py-1 rounded-full hover:bg-gray-300 transition-colors duration-200"
                           >
                             <i className="fa fa-plus"></i>
@@ -251,7 +251,7 @@ export default function Cart() {
                       </td>
                       <td className="p-4 text-center">
                         <button
-                          onClick={(e) => handleDelete(cart.id)}
+                          onClick={() => handleDelete(cart.id)}
                           className="bg-red-500 text-white px-3 py-1 rounded-full hover:bg-red-600 transition-colors duration-200"
                         >
                           <i className="fa fa-times"></i>
@@ -352,8 +352,7 @@ export default function Cart() {
               <img
                 className="w-full h-full object-cover rounded-md shadow-lg border-2 border-gray-200"
                 src={qrImage}
-                alt="QR Code"
-              />
+                alt=""/>
             )}
           </div>
           <form onSubmit={(e) => handleSave(e)}>

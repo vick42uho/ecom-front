@@ -25,7 +25,6 @@ export default function SignIn() {
                 window.location.href = '/web'
             }
         } catch (error: unknown) {
-            const err = error as ApiError;
             Swal.fire({
                 title: 'username ไม่ถูกต้อง',
                 text: 'ไม่มีผู้ใช้นี้ในระบบ',
