@@ -38,10 +38,11 @@ export default function SideBar() {
                 }
             }
             
-        } catch (err: any) {
+        } catch (error: unknown) {
+            const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
             Swal.fire({
                 title: 'Error FetchData...',
-                text: err.message,
+                text: errorMessage,
                 icon: 'error'
             })
             // console.log(err)

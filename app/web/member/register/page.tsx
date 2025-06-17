@@ -4,13 +4,14 @@ import { useState } from "react"
 import { Config } from "@/app/config"
 import axios from "axios"
 import Swal from "sweetalert2"
-import Router from "next/router"
+import { useRouter } from "next/navigation"
 
 export default function Register() {
     const [phone, setPhone] = useState('')
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
     const [confirmPassword, setConfirmPassword] = useState('')
+    const router = useRouter()
 
     const handleSignUp = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -36,13 +37,14 @@ export default function Register() {
                     text: 'สมัครสมาชิกเรียบร้อย',
                     icon: 'success'
                 })
-                // Router.push('/member/sign-in')
+                router.push('/member/sign-in')
             }
             
-        } catch (error: any) {
+        } catch (error: unknown) {
+            const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
             Swal.fire({
                 title: 'เกิดข้อผิดพลาด',
-                text: error.message,
+                text: errorMessage,
                 icon: 'error'
             })
         }

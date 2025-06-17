@@ -66,13 +66,19 @@ const resetForm = () => {
 
 const handelSave = async () => {
     try {
-      let response: any;
       const data = new FormData()
-      data.append("image", image as Blob)
+      if (image) {
+        data.append("image", image as Blob)
+      }
       data.append("isbn", isbn)
       data.append("name", name)
       data.append("price", price.toString())
       data.append("description", description)
+      
+      let response: {
+        status: number;
+        data: BookInterface;
+      }
 
       if (id == '') {
         
