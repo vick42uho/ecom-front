@@ -149,7 +149,7 @@ const handelDelete = async (book: BookInterface) => {
     }
 }
 
-const chooseFile = (files: any) => {
+const chooseFile = (files: FileList | null) => {
     if (files && files.length > 0) {
       // console.log(files[0])
       const file: File = files[0]
@@ -185,7 +185,7 @@ const chooseFile = (files: any) => {
               <tr key={book.id}>
                 <td className="text-center">
                   {book.image != null ? 
-                    <img src={Config.apiURL + '/uploads/' + book.image} className="w-[150px] rounded-xl shadow-md"/>
+                    <img src={Config.apiURL + '/uploads/' + book.image} className="w-[150px] rounded-xl shadow-md" alt=""/>
                     : <i className="fa fa-image text-6xl text-gray-500"></i>
                   }
                   </td>
@@ -242,7 +242,7 @@ const chooseFile = (files: any) => {
             <label>รูปภาพ</label>
             {imageUrl != null ?
             <img src={Config.apiURL + '/uploads/' + imageUrl} 
-            className="rounded-lg mt-3 mb-3"/>
+            className="rounded-lg mt-3 mb-3" alt=""/>
             : null}
             <input type="file" onChange={(e) => chooseFile(e.target.files)} />
           </div>
