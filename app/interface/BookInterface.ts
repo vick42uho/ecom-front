@@ -8,3 +8,12 @@ export interface BookInterface {
     createdAt: Date;
     updatedAt: Date;
 }
+
+export interface ApiError {
+    response?: {
+        data?: {
+            message?: string;
+        };
+    };
+    message?: string;
+}

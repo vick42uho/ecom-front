@@ -1,11 +1,12 @@
 "use client";
 
-import { BookInterface } from "@/app/interface/BookInterface";
+import { BookInterface, ApiError } from "@/app/interface/BookInterface";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
 import { Config } from "@/app/config";
 import Modal from "../components/Modal";
+
 
 export default function BookPage() {
   const [books, setBooks] = useState<BookInterface[]>([]);
@@ -30,10 +31,11 @@ export default function BookPage() {
         setBooks(response.data)
       }
       
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const err = error as ApiError;
       Swal.fire({
         title: 'เกิดข้อผิพลาด',
-        text: error.message,
+        text: err.response?.data?.message || err.message,
         icon: 'error'
       })
     }
@@ -93,10 +95,11 @@ const handelSave = async () => {
           fetchData()
           closeModal()
         }
-    } catch (error: any) {
+    } catch (error: unknown) {
+        const err = error as ApiError;
         Swal.fire({
             title: 'เกิดข้อผิดพลาด',
-            text: error.message,
+            text: err.response?.data?.message || err.message,
             icon: 'error'
         })
     }
@@ -135,10 +138,11 @@ const handelDelete = async (book: BookInterface) => {
                 })
                 fetchData()
             }
-        } catch (error: any) {
+        } catch (error: unknown) {
+            const err = error as ApiError;
             Swal.fire({
                 title: 'เกิดข้อผิดพลาด',
-                text: error.message,
+                text: err.response?.data?.message || err.message,
                 icon: 'error'
             })
         }
