@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import axios from "axios";
 import { Config } from "@/app/config";
@@ -13,13 +13,7 @@ export default function SideBar() {
     const [name, setName] = useState('')
     const [role, setRole] = useState('')
 
-    useEffect(() => {
-        fetchData()
-    }, [])
-
-
-
-    const fetchData = async () => {
+    const fetchData = useCallback(async () => {
         try {
             const url = Config.apiURL + '/api/admin/info'
             const token = localStorage.getItem(Config.tokenName)
@@ -47,8 +41,15 @@ export default function SideBar() {
             })
             // console.log(err)
         }
+    }, [router]);
 
-    }
+    useEffect(() => {
+        fetchData()
+    }, [fetchData])
+
+
+
+    // ฟังก์ชันถูกย้ายไปด้านบนและใช้ useCallback แล้ว
 
 
     const handleSignOut = async () => {

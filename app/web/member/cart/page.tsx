@@ -1,11 +1,12 @@
 "use client";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Config } from "@/app/config";
 import { CartInterface } from "@/app/interface/CartInterface";
 import Swal from "sweetalert2";
 import { ApiError } from "@/app/interface/ErrorInterface";
+import Image from "next/image";
 
 export default function Cart() {
   const [carts, setCarts] = useState<CartInterface[]>([]);
@@ -18,91 +19,106 @@ export default function Cart() {
   const [phone, setPhone] = useState("");
   const [myFile, setMyFile] = useState<File | null>(null);
 
-  useEffect(() => {
-    fetchDataMember();
-
-    if (memberId != "") {
-      fetchData();
-    }
-  }, [memberId]);
-
-  useEffect(() => {
-    computeTotalAmount();
-  }, [carts]);
-
-  useEffect(() => {
-    if (totalAmount > 0) {
-      fetchQrImage();
-    }
-  }, [totalAmount]);
-
-  const fetchQrImage = async () => {
+  const fetchQrImage = useCallback(async () => {
+    if (totalAmount <= 0) return;
+    
     try {
-      const url = "https://www.pp-qr.com/api/0868776053/" + totalAmount;
-      const response = await axios.get(url);
-
+      const url = `https://www.pp-qr.com/api/0868776053/${totalAmount}`;
+      const response = await axios.get<{ qrImage: string }>(url);
       if (response.status === 200) {
         setQrImage(response.data.qrImage);
       }
     } catch (error: unknown) {
       const err = error as ApiError;
+      console.error('Error fetching QR code:', err);
       Swal.fire({
         title: "เกิดข้อผิดพลาด",
-        text: err.response?.data?.message || err.message,
+        text: err.response?.data?.message || err.message || "ไม่สามารถดึงข้อมูล QR code ได้",
         icon: "error",
       });
     }
-  };
+  }, [totalAmount]);
 
-  const computeTotalAmount = () => {
-    let sum = 0;
-
-    for (let i = 0; i < carts.length; i++) {
-      const item = carts[i];
-      sum += item.qty * item.book.price;
+  const computeTotalAmount = useCallback(() => {
+    if (!carts || carts.length === 0) {
+      setTotalAmount(0);
+      return;
     }
-
+    
+    const sum = carts.reduce((total, item) => {
+      return total + (item.qty * item.book.price);
+    }, 0);
+    
     setTotalAmount(sum);
-  };
+  }, [carts]);
 
-  const fetchDataMember = async () => {
+  const fetchDataMember = useCallback(async () => {
     try {
+      const token = localStorage.getItem(Config.tokenMember);
+      if (!token) {
+        router.push('/web/member/sign-in');
+        return;
+      }
+      
       const url = `${Config.apiURL}/api/member/info`;
       const headers = {
-        Authorization: `Bearer ${localStorage.getItem(Config.tokenMember)}`,
+        Authorization: `Bearer ${token}`,
       };
       const response = await axios.get(url, { headers });
       if (response.status === 200) {
         setMemberId(response.data.id);
+        setName(response.data.name || "");
+        setAddress(response.data.address || "");
+        setPhone(response.data.phone || "");
       }
     } catch (error: unknown) {
       const err = error as ApiError;
-      Swal.fire({
-        title: "เกิดข้อผิดพลาด",
-        text: err.response?.data?.message || err.message,
-        icon: "error",
-      });
+      console.error('Error fetching member data:', err);
     }
-  };
+  }, [router]);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
+    if (!memberId) return;
+    
     try {
       const url = `${Config.apiURL}/api/cart/list/${memberId}`;
-      const response = await axios.get(url);
+      const response = await axios.get<CartInterface[]>(url);
       if (response.status === 200) {
         setCarts(response.data);
       }
     } catch (error: unknown) {
       const err = error as ApiError;
-      Swal.fire({
-        title: "เกิดข้อผิดพลาด",
-        text: err.response?.data?.message || err.message,
-        icon: "error",
-      });
+      console.error('Error fetching cart data:', err);
     }
-  };
+  }, [memberId]);
 
-  const handleDelete = async (id: string) => {
+  // Initial data loading
+  useEffect(() => {
+    fetchDataMember();
+  }, [fetchDataMember]);
+
+  // Load cart when memberId changes
+  useEffect(() => {
+    if (memberId) {
+      fetchData();
+    }
+  }, [memberId, fetchData]);
+
+  // Update total amount when cart changes
+  useEffect(() => {
+    computeTotalAmount();
+  }, [carts, computeTotalAmount]);
+
+  // Update QR code when total amount changes
+  useEffect(() => {
+    if (totalAmount > 0) {
+      fetchQrImage();
+    }
+  }, [totalAmount, fetchQrImage]);
+
+  // ฟังก์ชันถูกย้ายไปด้านบนและใช้ useCallback แล้ว
+
+  const handleDelete = useCallback(async (id: string) => {
     try {
       const cart = carts.find((item) => item.id === id);
       const button = await Swal.fire({
@@ -113,11 +129,11 @@ export default function Cart() {
         showConfirmButton: true,
       });
       if (button.isConfirmed) {
-        const url = Config.apiURL + "/api/cart/delete/" + id;
+        const url = `${Config.apiURL}/api/cart/delete/${id}`;
         const response = await axios.delete(url);
         if (response.status === 200) {
           fetchData();
-          Swal.fire({
+          await Swal.fire({
             title: "ลบสำเร็จ",
             text: "สินค้าถูกลบออกจากตะกร้า",
             icon: "success",
@@ -127,13 +143,13 @@ export default function Cart() {
       }
     } catch (error: unknown) {
       const err = error as ApiError;
-      Swal.fire({
+      await Swal.fire({
         title: "เกิดข้อผิดพลาด",
         text: err.response?.data?.message || err.message,
         icon: "error",
       });
     }
-  };
+  }, [carts, fetchData]);
 
   const upQty = async (id: string) => {
     try {
@@ -275,7 +291,56 @@ export default function Cart() {
     );
   };
 
-  const handleSave = async (e: React.FormEvent) => {
+  const handleChooseFile = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (files && files.length > 0) {
+      setMyFile(files[0]);
+    }
+  }, []);
+
+  const handleUploadFile = useCallback(async () => {
+    if (!myFile) return;
+    
+    const form = new FormData();
+    form.append("myFile", myFile as Blob);
+
+    const url = `${Config.apiURL}/api/cart/uploadSlip`;
+    await axios.post(url, form);
+  }, [myFile]);
+
+  const handleUpdateMember = useCallback(async () => {
+    const url = `${Config.apiURL}/api/cart/confirm`;
+    const token = localStorage.getItem(Config.tokenMember);
+    if (!token) return;
+    
+    const headers = {
+      Authorization: `Bearer ${token}`,
+    };
+    const payload = {
+      name,
+      address,
+      phone,
+    };
+    await axios.post(url, payload, { headers });
+  }, [name, address, phone]);
+
+  const handleSaveOrder = useCallback(async () => {
+    if (!myFile) return;
+    
+    const token = localStorage.getItem(Config.tokenMember);
+    if (!token) return;
+    
+    const headers = {
+      Authorization: `Bearer ${token}`,
+    };
+    const payload = {
+      slipName: myFile.name,
+    };
+    const url = `${Config.apiURL}/api/cart/confirmOrder`;
+    await axios.post(url, payload, { headers });
+  }, [myFile]);
+
+  const handleSave = useCallback(async (e: React.FormEvent) => {
     try {
       e.preventDefault();
 
@@ -286,62 +351,13 @@ export default function Cart() {
       router.push("/web/member/cart/success");
     } catch (error: unknown) {
       const err = error as ApiError;
-      Swal.fire({
+      await Swal.fire({
         title: "เกิดข้อผิดพลาด",
         text: err.response?.data?.message || err.message || 'เกิดข้อผิดพลาดที่ไม่ทราบสาเหตุ',
         icon: "error",
       });
     }
-  };
-
-  const handleUpdateMember = async () => {
-    const url = Config.apiURL + "/api/cart/confirm";
-    const headers = {
-      Authorization: `Bearer ${localStorage.getItem(Config.tokenMember)}`,
-    };
-    const payload = {
-      name: name,
-      address: address,
-      phone: phone,
-    };
-    const response = await axios.post(url, payload, { headers });
-
-    if (response.status === 200) {
-      handleUploadFile();
-    }
-  };
-
-  const handleChooseFile = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (files && files.length > 0) {
-      setMyFile(files[0]);
-    }
-  };
-
-  const handleUploadFile = async () => {
-    const form = new FormData();
-    form.append("myFile", myFile as Blob);
-
-    const url = Config.apiURL + "/api/cart/uploadSlip";
-    await axios.post(url, form);
-  };
-
-  const handleSaveOrder = async () => {
-    if (myFile) {
-      const headers = {
-        Authorization: `Bearer ${localStorage.getItem(Config.tokenMember)}`,
-      };
-      const payload = {
-        slipName: myFile.name,
-      };
-      const url = Config.apiURL + "/api/cart/confirmOrder";
-      const response = await axios.post(url, payload, { headers });
-
-      if (response.status === 200) {
-        
-      }
-    }
-  };
+  }, [handleUpdateMember, handleUploadFile, handleSaveOrder, router]);
   const uiPay = () => {
     return (
       <>
@@ -349,10 +365,13 @@ export default function Cart() {
           <div className="text-2xl font-bold">การชำระเงิน</div>
           <div className="text-center mt-2">
             {qrImage && (
-              <img
+              <Image
                 className="w-full h-full object-cover rounded-md shadow-lg border-2 border-gray-200"
                 src={qrImage}
-                alt=""/>
+                alt="QR Code สำหรับชำระเงิน"
+                width={300}
+                height={300}
+              />
             )}
           </div>
           <form onSubmit={(e) => handleSave(e)}>
