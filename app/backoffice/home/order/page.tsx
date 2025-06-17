@@ -3,11 +3,35 @@
 import { Config } from "@/app/config";
 import { OrderInterface } from "@/app/interface/OrderInterface";
 import axios from "axios";
-import { JSX, useState } from "react";
-import { useEffect } from "react";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import React, { JSX, useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import Modal from "../components/Modal";
 import { ApiError } from "@/app/interface/AdminInterface";
+
+interface StatusBadgeProps {
+  status: string;
+}
+
+const StatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
+  const statusMap: Record<string, { text: string; color: string; icon: string }> = {
+    'pending': { text: 'รอชำระเงิน', color: 'bg-yellow-100 text-yellow-800', icon: 'fa-clock' },
+    'paid': { text: 'ชำระเงินแล้ว', color: 'bg-blue-100 text-blue-800', icon: 'fa-check-circle' },
+    'shipped': { text: 'จัดส่งแล้ว', color: 'bg-green-100 text-green-800', icon: 'fa-truck' },
+    'completed': { text: 'สำเร็จ', color: 'bg-green-600 text-white', icon: 'fa-check' },
+    'cancelled': { text: 'ยกเลิก', color: 'bg-red-100 text-red-800', icon: 'fa-times' },
+    'default': { text: status, color: 'bg-gray-100 text-gray-800', icon: 'fa-question' }
+  };
+
+  const { text, color, icon } = statusMap[status] || statusMap['default'];
+
+  return (
+    <span className={`px-3 py-1 rounded-full text-xs font-medium ${color}`}>
+      <i className={`fa ${icon} mr-1`}></i> {text}
+    </span>
+  );
+};
 
 export default function Order() {
   const [orders, setOrders] = useState<OrderInterface[]>([]);
@@ -163,6 +187,11 @@ export default function Order() {
 
   const handleSend = async () => {
     try {
+       const handleInputChange = ({ target: { name, value } }: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    if (name === 'trackCode') setTrackCode(value);
+    if (name === 'express') setExpress(value);
+    if (name === 'remark') setRemark(value);
+  };
        const url = Config.apiURL + '/api/order/send'
        const payload = {
         trackCode: trackCode,
@@ -221,7 +250,7 @@ export default function Order() {
               <td>
                 <button
                   className="btn btn-primary"
-                  onClick={(e) => openModal(order)}
+                  onClick={() => openModal(order)}
                 >
                   <i className="fa fa-file mr-2"></i>ดูข้อมูล
                 </button>
@@ -242,10 +271,15 @@ export default function Order() {
             <input value={express} onChange={(e) => setExpress(e.target.value)}/>
           </div>
           <div className="mb-3">
-            <label>เอกสารการโอนเงิน</label>
-            <img src={Config.apiURL + '/uploads/slip/' + order?.slipImage}
-            className="w-[350px] rounded-xl"
-            />
+            <div className="relative w-[350px] h-[350px]">
+              <Image
+                src={`${Config.apiURL}/uploads/slip/${order?.slipImage}`}
+                alt={order?.slipImage || 'Slip image'}
+                fill
+                className="object-cover rounded-lg"
+                sizes="350px"
+              />
+            </div>
           </div>
 
           <table className="table mt-5">

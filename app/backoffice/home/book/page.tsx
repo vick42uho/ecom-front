@@ -6,6 +6,7 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import { Config } from "@/app/config";
 import Modal from "../components/Modal";
+import Image from "next/image";
 
 
 export default function BookPage() {
@@ -149,7 +150,7 @@ const handelDelete = async (book: BookInterface) => {
     }
 }
 
-const chooseFile = (files: FileList | null) => {
+const chooseFile = (files: FileList | null): void => {
     if (files && files.length > 0) {
       // console.log(files[0])
       const file: File = files[0]
@@ -184,10 +185,19 @@ const chooseFile = (files: FileList | null) => {
             {books.map((book: BookInterface) => (
               <tr key={book.id}>
                 <td className="text-center">
-                  {book.image != null ? 
-                    <img src={Config.apiURL + '/uploads/' + book.image} className="w-[150px] rounded-xl shadow-md" alt=""/>
-                    : <i className="fa fa-image text-6xl text-gray-500"></i>
-                  }
+                  {book.image != null ? (
+                    <div className="relative w-[150px] h-[150px]">
+                      <Image 
+                        src={`${Config.apiURL}/uploads/${book.image}`}
+                        alt={book.name || 'Book cover'}
+                        fill
+                        className="object-cover rounded-xl shadow-md"
+                        sizes="150px"
+                      />
+                    </div>
+                  ) : (
+                    <i className="fa fa-image text-6xl text-gray-500"></i>
+                  )}
                   </td>
                 <td>{book.isbn}</td>
                 <td>{book.name}</td>
@@ -240,10 +250,17 @@ const chooseFile = (files: FileList | null) => {
           </div>
           <div>
             <label>รูปภาพ</label>
-            {imageUrl != null ?
-            <img src={Config.apiURL + '/uploads/' + imageUrl} 
-            className="rounded-lg mt-3 mb-3" alt=""/>
-            : null}
+            {imageUrl != null && (
+              <div className="relative w-full h-48 mt-3 mb-3">
+                <Image
+                  src={`${Config.apiURL}/uploads/${imageUrl}`}
+                  alt="Preview"
+                  fill
+                  className="object-cover rounded-lg"
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                />
+              </div>
+            )}
             <input type="file" onChange={(e) => chooseFile(e.target.files)} />
           </div>
           <div className="flex justify-end gap-2 mt-6">

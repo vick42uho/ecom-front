@@ -3,8 +3,9 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Config } from "../config";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import Swal from "sweetalert2";
+import { ApiError } from "@/app/interface/AdminInterface";
 
 
 
@@ -28,10 +29,11 @@ export default function MemberLayout({
           setUsername(response.data.username)
         }
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const err = error as ApiError;
       Swal.fire({
         title: 'เกิดข้อผิดพลาด',
-        text: error.message,
+        text: err.response?.data?.message || err.message || 'เกิดข้อผิดพลาดที่ไม่ทราบสาเหตุ',
         icon: 'error'
       })
     }
