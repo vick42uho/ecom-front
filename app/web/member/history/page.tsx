@@ -5,6 +5,7 @@ import { OrderInterface } from "@/app/interface/OrderInterface";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
+import { ApiError } from "@/app/interface/AdminInterface";
 
 export default function History() {
   const [orders, setOrders] = useState<OrderInterface[]>([]);
@@ -43,10 +44,11 @@ export default function History() {
         }
         setOrders(rows);
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const err = error as ApiError;
       Swal.fire({
         title: "เกิดข้อผิดพลาด",
-        text: error.message,
+        text: err.response?.data?.message || err.message,
         icon: "error",
       });
     }

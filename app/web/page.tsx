@@ -8,10 +8,11 @@ import Swal from "sweetalert2";
 import { BookInterface } from "../interface/BookInterface";
 import { CartInterface } from "../interface/CartInterface";
 import Link from "next/link";
+import { ApiError } from "../interface/AdminInterface";
 
 export default function Home() {
   const [books, setBooks] = useState<BookInterface[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [, setLoading] = useState(true);
   const [token, setToken] = useState('')
   const [carts, setCarts] = useState<CartInterface[]>([])
   const [memberId, setMemberId] = useState('')
@@ -39,10 +40,11 @@ export default function Home() {
       if (response.status === 200) {
         setMemberId(response.data.id)
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const err = error as ApiError;
       Swal.fire({
         title: 'เกิดข้อผิดพลาด',
-        text: error.message,
+        text: err.response?.data?.message || err.message,
         icon: 'error'
       })
     }
@@ -58,10 +60,11 @@ export default function Home() {
       if (response.status === 200) {
         setBooks(response.data);
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const err = error as ApiError;
       Swal.fire({
         title: "เกิดข้อผิดพลาด",
-        text: error.message,
+        text: err.response?.data?.message || err.message,
         icon: "error",
       });
     } finally {
@@ -84,10 +87,11 @@ export default function Home() {
         setQtyInCart(sum)
         }
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const err = error as ApiError;
       Swal.fire({
         title: "เกิดข้อผิดพลาด",
-        text: error.message,
+        text: err.response?.data?.message || err.message,
         icon: "error",
       });
     }
@@ -103,10 +107,11 @@ export default function Home() {
       const response = await axios.post(url, payload)
       if (response.status === 200) {
         fetchDataCart()
-      }    } catch (error: any) {
+      }    } catch (error: unknown) {
+      const err = error as ApiError;
       Swal.fire({
         title: "เกิดข้อผิดพลาด",
-        text: error.message,
+        text: err.response?.data?.message || err.message,
         icon: "error",
       });
     }

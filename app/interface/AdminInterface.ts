@@ -27,9 +27,19 @@ export interface Admin {
 
 export interface ApiError extends Error {
     response?: {
+        status?: number;
         data?: {
+            status?: number;
             message?: string;
+            [key: string]: any;
         };
     };
+    status?: number;
+    data?: {
+        status?: number;
+        message?: string;
+        [key: string]: any;
+    };
     message: string;
+    [key: string]: any;
 }

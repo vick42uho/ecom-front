@@ -3,12 +3,11 @@ import { useState } from "react";
 import { Config } from "@/app/config";
 import axios from "axios";
 import Swal from "sweetalert2";
-import { useRouter } from "next/navigation";
+import { ApiError } from "@/app/interface/AdminInterface";
 
 export default function SignIn() {
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
-    const router = useRouter()
 
     const handelSignIn = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -25,7 +24,8 @@ export default function SignIn() {
                 // router.push('/web')
                 window.location.href = '/web'
             }
-        } catch (error: any) {
+        } catch (error: unknown) {
+            const err = error as ApiError;
             Swal.fire({
                 title: 'username ไม่ถูกต้อง',
                 text: 'ไม่มีผู้ใช้นี้ในระบบ',

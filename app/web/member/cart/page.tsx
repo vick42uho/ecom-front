@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { Config } from "@/app/config";
 import { CartInterface } from "@/app/interface/CartInterface";
 import Swal from "sweetalert2";
+import { ApiError } from "@/app/interface/AdminInterface";
 
 export default function Cart() {
   const [carts, setCarts] = useState<CartInterface[]>([]);
@@ -43,10 +44,11 @@ export default function Cart() {
       if (response.status === 200) {
         setQrImage(response.data.qrImage);
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const err = error as ApiError;
       Swal.fire({
         title: "เกิดข้อผิดพลาด",
-        text: error.message,
+        text: err.response?.data?.message || err.message,
         icon: "error",
       });
     }
@@ -73,10 +75,11 @@ export default function Cart() {
       if (response.status === 200) {
         setMemberId(response.data.id);
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const err = error as ApiError;
       Swal.fire({
         title: "เกิดข้อผิดพลาด",
-        text: error.message,
+        text: err.response?.data?.message || err.message,
         icon: "error",
       });
     }
@@ -89,10 +92,11 @@ export default function Cart() {
       if (response.status === 200) {
         setCarts(response.data);
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const err = error as ApiError;
       Swal.fire({
         title: "เกิดข้อผิดพลาด",
-        text: error.message,
+        text: err.response?.data?.message || err.message,
         icon: "error",
       });
     }
@@ -121,10 +125,11 @@ export default function Cart() {
           });
         }
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const err = error as ApiError;
       Swal.fire({
         title: "เกิดข้อผิดพลาด",
-        text: error.message,
+        text: err.response?.data?.message || err.message,
         icon: "error",
       });
     }
@@ -138,10 +143,11 @@ export default function Cart() {
       if (response.status === 200) {
         fetchData();
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const err = error as ApiError;
       Swal.fire({
         title: "เกิดข้อผิดพลาด",
-        text: error.message,
+        text: err.response?.data?.message || err.message,
         icon: "error",
       });
     }
@@ -155,8 +161,12 @@ export default function Cart() {
       if (response.status === 200) {
         fetchData();
       }
-    } catch (error: any) {
-      if (error.status === 400) {
+    } catch (error: unknown) {
+      const err = error as ApiError;
+      const status = err.response?.status || err.response?.data?.status;
+      const message = err.response?.data?.message || err.message || 'เกิดข้อผิดพลาดที่ไม่ทราบสาเหตุ';
+      
+      if (status === 400 || message.includes('minimum')) {
         Swal.fire({
           text: "สินค้าควรมีจำนวนอย่างน้อย 1 รายการ",
           title: "ตรวจสอบรายการ",
@@ -165,7 +175,7 @@ export default function Cart() {
       } else {
         Swal.fire({
           title: "เกิดข้อผิดพลาด",
-          text: error.message,
+          text: message,
           icon: "error",
         });
       }
@@ -341,6 +351,7 @@ export default function Cart() {
               <img
                 className="w-full h-full object-cover rounded-md shadow-lg border-2 border-gray-200"
                 src={qrImage}
+                alt="QR Code"
               />
             )}
           </div>

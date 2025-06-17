@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Config } from "../config";
-import axios, { AxiosError } from "axios";
+import axios from "axios";
 import Swal from "sweetalert2";
 import { ApiError } from "@/app/interface/AdminInterface";
 
