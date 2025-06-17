@@ -4,6 +4,7 @@ import { Config } from "@/app/config";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
+import { ApiError } from "@/app/interface/AdminInterface";
 
 export default function DashboardPage() {
   const [totalOrder, setTotalOrder] = useState(0);
@@ -27,10 +28,11 @@ export default function DashboardPage() {
         setTotalIncome(response.data.totalIncome);
         setTotalMember(response.data.totalMember);
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const err = error as ApiError;
       Swal.fire({
         title: "เกิดข้อผิดพลาด",
-        text: error.response?.data?.message || error.message,
+        text: err.response?.data?.message || err.message,
         icon: "error",
       })
     }

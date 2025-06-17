@@ -7,6 +7,7 @@ import { JSX, useState } from "react";
 import { useEffect } from "react";
 import Swal from "sweetalert2";
 import Modal from "../components/Modal";
+import { ApiError } from "@/app/interface/AdminInterface";
 
 export default function Order() {
   const [orders, setOrders] = useState<OrderInterface[]>([]);
@@ -31,10 +32,11 @@ export default function Order() {
       if (response.status == 200) {
         setOrders(response.data);
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const err = error as ApiError;
       Swal.fire({
         title: "เกิดข้อผิดพลาด",
-        text: error.response?.data?.message || error.message,
+        text: err.response?.data?.message || err.message,
         icon: "error",
       });
     }
@@ -109,10 +111,11 @@ export default function Order() {
                 fetchData();
             }
         }        
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const err = error as ApiError;
         Swal.fire({
             title: "เกิดข้อผิดพลาด",
-            text: error.response?.data?.message || error.message,
+            text: err.response?.data?.message || err.message,
             icon: "error",
         })
     }
@@ -147,10 +150,11 @@ export default function Order() {
                 fetchData();
             }
         }        
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const err = error as ApiError;
         Swal.fire({
             title: "เกิดข้อผิดพลาด",
-            text: error.response?.data?.message || error.message,
+            text: err.response?.data?.message || err.message,
             icon: "error",
         })
     }
@@ -181,10 +185,11 @@ export default function Order() {
            closeModal();
            fetchData();
        }
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const err = error as ApiError;
         Swal.fire({
             title: "เกิดข้อผิดพลาด",
-            text: error.response?.data?.message || error.message,
+            text: err.response?.data?.message || err.message,
             icon: "error",
         })
     }

@@ -5,6 +5,7 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import { Config } from "../../config";
 import { useRouter } from "next/navigation";
+import { ApiError } from "../../interface/AdminInterface";
 
 export default function SigninPage() {
     const router = useRouter();
@@ -38,11 +39,12 @@ export default function SigninPage() {
                 });
                 
             }
-        } catch (error: any) {
+        } catch (error: unknown) {
+          const err = error as ApiError;
             Swal.fire({
                 icon: 'error',
                 title: 'Error...',
-                text: error.message,
+                text: err.response?.data?.message || err.message,
             });
             console.log(error);
         }

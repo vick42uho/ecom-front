@@ -3,6 +3,7 @@ import { Config } from "@/app/config"
 import axios from "axios"
 import { useEffect, useState } from "react"
 import Swal from "sweetalert2"
+import { ApiError } from "@/app/interface/AdminInterface"
 
 export default function EditProfilePage() {
     const [name, setName] = useState('')
@@ -42,13 +43,14 @@ export default function EditProfilePage() {
                 })
             }
             
-        } catch (err: any) {
+        } catch (err: unknown) {
+            const error = err as ApiError;
             Swal.fire({
                 title: 'Error...',
-                text: err.message,
+                text: error.response?.data?.message || error.message,
                 icon: 'error'
             })
-            console.log(err)
+            console.log(error)
         }
     }
 
@@ -67,10 +69,11 @@ export default function EditProfilePage() {
                 setName(response.data.name)
                 setUsername(response.data.username)
             }
-        } catch (err: any) {
+        } catch (err: unknown) {
+            const error = err as ApiError;
             Swal.fire({
                 title: 'Error FetchData...',
-                text: err.message,
+                text: error.response?.data?.message || error.message,
                 icon: 'error'
             })
         }
