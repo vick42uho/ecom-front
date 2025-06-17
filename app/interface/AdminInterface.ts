@@ -25,21 +25,5 @@ export interface Admin {
     role: string;
 }
 
-export interface ApiError extends Error {
-    response?: {
-        status?: number;
-        data?: {
-            status?: number;
-            message?: string;
-            [key: string]: any;
-        };
-    };
-    status?: number;
-    data?: {
-        status?: number;
-        message?: string;
-        [key: string]: any;
-    };
-    message: string;
-    [key: string]: any;
-}
+
+

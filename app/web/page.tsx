@@ -8,7 +8,7 @@ import Swal from "sweetalert2";
 import { BookInterface } from "../interface/BookInterface";
 import { CartInterface } from "../interface/CartInterface";
 import Link from "next/link";
-import { ApiError } from "../interface/AdminInterface";
+import { ApiError } from "@/app/interface/ErrorInterface";
 
 export default function Home() {
   const [books, setBooks] = useState<BookInterface[]>([]);

@@ -9,11 +9,4 @@ export interface BookInterface {
     updatedAt: Date;
 }
 
-export interface ApiError {
-    response?: {
-        data?: {
-            message?: string;
-        };
-    };
-    message?: string;
-}
+

@@ -5,7 +5,7 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import { Config } from "../../config";
 import { useRouter } from "next/navigation";
-import { ApiError } from "../../interface/AdminInterface";
+import { ApiError } from "@/app/interface/ErrorInterface";
 
 export default function SigninPage() {
     const router = useRouter();

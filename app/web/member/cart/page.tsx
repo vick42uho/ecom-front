@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { Config } from "@/app/config";
 import { CartInterface } from "@/app/interface/CartInterface";
 import Swal from "sweetalert2";
-import { ApiError } from "@/app/interface/AdminInterface";
+import { ApiError } from "@/app/interface/ErrorInterface";
 
 export default function Cart() {
   const [carts, setCarts] = useState<CartInterface[]>([]);
@@ -284,10 +284,11 @@ export default function Cart() {
       await handleSaveOrder();
 
       router.push("/web/member/cart/success");
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const err = error as ApiError;
       Swal.fire({
         title: "เกิดข้อผิดพลาด",
-        text: error.message,
+        text: err.response?.data?.message || err.message || 'เกิดข้อผิดพลาดที่ไม่ทราบสาเหตุ',
         icon: "error",
       });
     }
@@ -310,10 +311,10 @@ export default function Cart() {
     }
   };
 
-  const handleChooseFile = (files: any) => {
-    if (files.length > 0) {
-      const file = files[0];
-      setMyFile(file);
+  const handleChooseFile = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (files && files.length > 0) {
+      setMyFile(files[0]);
     }
   };
 
@@ -382,7 +383,8 @@ export default function Cart() {
               <input
                 type="file"
                 className="w-full"
-                onChange={(e) => handleChooseFile(e.target.files)}
+                onChange={handleChooseFile}
+                accept="image/*"
               />
             </div>
             <div>

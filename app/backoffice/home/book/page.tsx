@@ -1,12 +1,13 @@
 "use client";
 
-import { BookInterface, ApiError } from "@/app/interface/BookInterface";
+import { BookInterface } from "@/app/interface/BookInterface";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
 import { Config } from "@/app/config";
 import Modal from "../components/Modal";
 import Image from "next/image";
+import { ApiError } from "@/app/interface/ErrorInterface";
 
 
 export default function BookPage() {
@@ -248,7 +249,11 @@ const chooseFile = (files: FileList | null): void => {
           </div>
           <div>
             <label>ราคา</label>
-            <input type="number" value={price} onChange={(e) => setPrice(parseInt(e.target.value))} />
+            <input 
+              type="number" 
+              value={price || ''} 
+              onChange={(e) => setPrice(Number(e.target.value) || 0)} 
+            />
           </div>
           <div>
             <label>รายละเอียด</label>

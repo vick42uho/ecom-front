@@ -4,7 +4,7 @@ import { Config } from "@/app/config";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
-import { ApiError } from "@/app/interface/AdminInterface";
+import { ApiError } from "@/app/interface/ErrorInterface";
 
 export default function DashboardPage() {
   const [totalOrder, setTotalOrder] = useState(0);

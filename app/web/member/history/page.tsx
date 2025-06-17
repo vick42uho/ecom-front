@@ -5,7 +5,7 @@ import { OrderInterface } from "@/app/interface/OrderInterface";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
-import { ApiError } from "@/app/interface/AdminInterface";
+import { ApiError } from "@/app/interface/ErrorInterface";
 
 export default function History() {
   const [orders, setOrders] = useState<OrderInterface[]>([]);

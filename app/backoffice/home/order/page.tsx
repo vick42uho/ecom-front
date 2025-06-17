@@ -7,7 +7,7 @@ import Image from "next/image";
 import React, { JSX, useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import Modal from "../components/Modal";
-import { ApiError } from "@/app/interface/AdminInterface";
+import { ApiError } from "@/app/interface/ErrorInterface";
 
 
 export default function Order() {

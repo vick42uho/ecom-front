@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Config } from "@/app/config";
 import axios from "axios";
 import Swal from "sweetalert2";
-import { ApiError } from "@/app/interface/AdminInterface";
+import { ApiError } from "@/app/interface/ErrorInterface";
 
 export default function SignIn() {
     const [username, setUsername] = useState('')
