@@ -24,3 +24,12 @@ export interface Admin {
     confirmPassword?: string;
     role: string;
 }
+
+export interface ApiError extends Error {
+    response?: {
+        data?: {
+            message?: string;
+        };
+    };
+    message: string;
+}

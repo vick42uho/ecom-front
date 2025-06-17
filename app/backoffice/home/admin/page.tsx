@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import Modal from "../components/Modal";
 import { Admin, AdminFormData, AdminPayload } from "../../../interface/AdminInterface";
+import { AxiosError } from "axios";
 
 
 
@@ -125,13 +126,30 @@ export default function AdminPage() {
                 fetchData();
                 closeModal();
             }
-        } catch (error: any) {
-            Swal.fire({
-                title: 'เกิดข้อผิดพลาด',
-                text: error.response?.data?.message || error.message,
-                icon: 'error'
-            });
-            console.error(error);
+        } catch (error: unknown) {
+            if (axios.isAxiosError(error)) {
+                const apiError = error as AxiosError<{ message?: string }>;
+                Swal.fire({
+                    title: 'เกิดข้อผิดพลาด',
+                    text: (apiError.response?.data as { message?: string })?.message || 
+                          apiError.message || 
+                          'เกิดข้อผิดพลาดที่ไม่ทราบสาเหตุ',
+                    icon: 'error'
+                });
+            } else if (error instanceof Error) {
+                Swal.fire({
+                    title: 'เกิดข้อผิดพลาด',
+                    text: error.message,
+                    icon: 'error'
+                });
+            } else {
+                Swal.fire({
+                    title: 'เกิดข้อผิดพลาด',
+                    text: 'เกิดข้อผิดพลาดที่ไม่ทราบสาเหตุ',
+                    icon: 'error'
+                });
+            }
+            console.error('Error:', error);
         }
     };
 
@@ -170,12 +188,29 @@ export default function AdminPage() {
                     });
                     fetchData();
                 }
-            } catch (error: any) {
-                Swal.fire({
-                    title: 'เกิดข้อผิดพลาด',
-                    text: error.message,
-                    icon: 'error'
-                })
+            } catch (error: unknown) {
+                if (axios.isAxiosError(error)) {
+                    const apiError = error as AxiosError<{ message?: string }>;
+                    Swal.fire({
+                        title: 'เกิดข้อผิดพลาด',
+                        text: (apiError.response?.data as { message?: string })?.message || 
+                              apiError.message || 
+                              'เกิดข้อผิดพลาดที่ไม่ทราบสาเหตุ',
+                        icon: 'error'
+                    });
+                } else if (error instanceof Error) {
+                    Swal.fire({
+                        title: 'เกิดข้อผิดพลาด',
+                        text: error.message,
+                        icon: 'error'
+                    });
+                } else {
+                    Swal.fire({
+                        title: 'เกิดข้อผิดพลาด',
+                        text: 'เกิดข้อผิดพลาดที่ไม่ทราบสาเหตุ',
+                        icon: 'error'
+                    });
+                }
             }
         }
     };
