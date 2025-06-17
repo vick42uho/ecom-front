@@ -4,7 +4,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import Modal from "../components/Modal";
-import { Admin, AdminFormData, AdminPayload } from "../../../interface/AdminInterface";
+import { Admin, AdminFormData, AdminPayload, ApiError } from "../../../interface/AdminInterface";
 import { AxiosError } from "axios";
 
 
@@ -36,10 +36,11 @@ export default function AdminPage() {
             if (response.status === 200) {
                 setAdmins(response.data);
             }
-        } catch (error: any) {
+        } catch (error: unknown) {
+            const err = error as ApiError;
             Swal.fire({
                 title: 'ไม่สามารถดึงข้อมูลได้',
-                text: error.response?.data?.message || error.message,
+                text: err.response?.data?.message || err.message,
                 icon: 'error'
             });
         }
