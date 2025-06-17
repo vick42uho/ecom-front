@@ -5,7 +5,6 @@ import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import Modal from "../components/Modal";
 import { Admin, AdminFormData, AdminPayload, ApiError } from "../../../interface/AdminInterface";
-import { AxiosError } from "axios";
 
 
 
@@ -129,10 +128,10 @@ export default function AdminPage() {
             }
         } catch (error: unknown) {
             if (axios.isAxiosError(error)) {
-                const apiError = error as AxiosError<{ message?: string }>;
+                const apiError = error as ApiError;
                 Swal.fire({
                     title: 'เกิดข้อผิดพลาด',
-                    text: (apiError.response?.data as { message?: string })?.message || 
+                    text: apiError.response?.data?.message || 
                           apiError.message || 
                           'เกิดข้อผิดพลาดที่ไม่ทราบสาเหตุ',
                     icon: 'error'
@@ -191,10 +190,10 @@ export default function AdminPage() {
                 }
             } catch (error: unknown) {
                 if (axios.isAxiosError(error)) {
-                    const apiError = error as AxiosError<{ message?: string }>;
+                    const apiError = error as ApiError;
                     Swal.fire({
                         title: 'เกิดข้อผิดพลาด',
-                        text: (apiError.response?.data as { message?: string })?.message || 
+                        text: apiError.response?.data?.message || 
                               apiError.message || 
                               'เกิดข้อผิดพลาดที่ไม่ทราบสาเหตุ',
                         icon: 'error'
