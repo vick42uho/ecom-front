@@ -23,7 +23,7 @@ export default function SignIn() {
                 // router.push('/web')
                 window.location.href = '/web'
             }
-        } catch (error: unknown) {
+        } catch {
             Swal.fire({
                 title: 'username ไม่ถูกต้อง',
                 text: 'ไม่มีผู้ใช้นี้ในระบบ',
