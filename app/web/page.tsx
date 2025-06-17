@@ -1,7 +1,8 @@
 // app/web/page.tsx
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
+import Image from "next/image";
 import axios from "axios";
 import { Config } from "../config";
 import Swal from "sweetalert2";
@@ -18,23 +19,13 @@ export default function Home() {
   const [memberId, setMemberId] = useState('')
   const [qtyInCart, setQtyInCart] = useState(0)
 
-  useEffect(() => {
-    readToken()
-    fetchData();
-
-    if (memberId != '') {
-      fetchDataCart()
-    }
-  }, [memberId]);
-
-
-  const readToken = async () => {
+  const readToken = useCallback(async () => {
     const token = localStorage.getItem(Config.tokenMember) ?? ''
     setToken(token)
     try {
-      const url = Config.apiURL + '/api/member/info'
+      const url = `${Config.apiURL}/api/member/info`
       const headers = {
-        'Authorization': 'Bearer ' + token
+        'Authorization': `Bearer ${token}`
       }
       const response = await axios.get(url, { headers })
       if (response.status === 200) {
@@ -48,14 +39,12 @@ export default function Home() {
         icon: 'error'
       })
     }
-    
-  }
+  }, []);
 
-
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       setLoading(true);
-      const url = Config.apiURL + "/api/book";
+      const url = `${Config.apiURL}/api/book`;
       const response = await axios.get(url);
       if (response.status === 200) {
         setBooks(response.data);
@@ -70,12 +59,12 @@ export default function Home() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const fetchDataCart = async () => {
+  const fetchDataCart = useCallback(async () => {
     try {
-      if (token != '') {
-        const url = Config.apiURL + '/api/cart/list/' + memberId
+      if (token && memberId) {
+        const url = `${Config.apiURL}/api/cart/list/${memberId}`
         const response = await axios.get(url)
         if (response.status === 200) {
           setCarts(response.data)
@@ -84,7 +73,7 @@ export default function Home() {
             const item = response.data[i]
             sum += item.qty
           }
-        setQtyInCart(sum)
+          setQtyInCart(sum)
         }
       }
     } catch (error: unknown) {
@@ -95,19 +84,31 @@ export default function Home() {
         icon: "error",
       });
     }
-  }
+  }, [token, memberId]);
 
-  const handleAddToCart = async (bookId: string) => {
+  useEffect(() => {
+    readToken()
+    fetchData();
+  }, [readToken, fetchData]);
+
+  useEffect(() => {
+    if (memberId) {
+      fetchDataCart()
+    }
+  }, [memberId, fetchDataCart]);
+
+  const handleAddToCart = useCallback(async (bookId: string) => {
     try {
-      const url = Config.apiURL + '/api/cart/add'
+      const url = `${Config.apiURL}/api/cart/add`
       const payload = {
-        memberId: memberId,
-        bookId: bookId
+        memberId,
+        bookId
       }
       const response = await axios.post(url, payload)
       if (response.status === 200) {
         fetchDataCart()
-      }    } catch (error: unknown) {
+      }
+    } catch (error: unknown) {
       const err = error as ApiError;
       Swal.fire({
         title: "เกิดข้อผิดพลาด",
@@ -115,7 +116,7 @@ export default function Home() {
         icon: "error",
       });
     }
-  }
+  }, [memberId, fetchDataCart])
 
   return (
     <div className="p-4 md:p-6 bg-gray-50 min-h-screen">
@@ -149,10 +150,12 @@ export default function Home() {
           >
             {/* Book Image */}
             <div className="relative overflow-hidden rounded-t-xl">
-              <img
+              <Image
                 src={`${Config.apiURL}/uploads/${book.image}`}
                 alt={book.name}
                 className="w-full h-48 object-cover transition-transform duration-300 hover:scale-105"
+                width={300}
+                height={200}
               />
             </div>
 

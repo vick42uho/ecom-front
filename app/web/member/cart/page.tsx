@@ -235,10 +235,12 @@ export default function Cart() {
                       className="border-b hover:bg-gray-100 transition-colors duration-200"
                     >
                       <td className="p-4">
-                        <img
+                        <Image
                           src={`${Config.apiURL}/uploads/${cart.book.image}`}
                           alt={cart.book.name}
                           className="w-16 h-16 md:w-20 md:h-20 object-cover rounded-md"
+                          width={80}
+                          height={80}
                         />
                       </td>
                       <td className="p-4 text-gray-700">{cart.book.name}</td>
