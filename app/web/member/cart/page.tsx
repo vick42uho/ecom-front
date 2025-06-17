@@ -222,7 +222,7 @@ export default function Cart() {
                 </tr>
               </thead>
               <tbody>
-                {carts.length === 0 ? (
+                {!carts || carts.length === 0 ? (
                   <tr>
                     <td colSpan={6} className="p-6 text-center text-gray-500">
                       ตะกร้าสินค้าว่างเปล่า

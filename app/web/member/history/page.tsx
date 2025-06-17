@@ -60,7 +60,7 @@ export default function History() {
         ติดตามสินค้า
       </div>
 
-      {orders.map((order) => (
+      {orders && orders.length > 0 ? orders.map((order) => (
         <div
           key={order.id}
           className="border mb-5 p-3 rounded-lg shadow-md bg-white"
@@ -103,7 +103,7 @@ export default function History() {
               </tr>
             </thead>
             <tbody>
-             {order.OrderDetail.map((orderDetail, index) =>
+             {order.OrderDetail && order.OrderDetail.length > 0 ? order.OrderDetail.map((orderDetail, index) =>
                 <tr key={index}>
                     <td className="p-3">{orderDetail.Book.isbn}</td>
                     <td className="p-3">{orderDetail.Book.name}</td>
@@ -114,6 +114,12 @@ export default function History() {
                         {orderDetail.amount.toLocaleString()}
                         </td>
                 </tr>
+             ) : (
+                <tr>
+                    <td colSpan={5} className="text-center py-4 text-gray-500">
+                        ไม่พบรายการสินค้า
+                    </td>
+                </tr>
              )}
             </tbody>
             <tfoot>
@@ -121,13 +127,17 @@ export default function History() {
                 <td colSpan={4} className="p-3"></td>
                 <td className="text-right p-3 bg-gray-400 rounded-br-xl rounded-bl-xl">
                   {/* {(order.OrderDetail.reduce((total, orderDetail) => total + orderDetail.price * orderDetail.qty, 0)).toLocaleString()} */}
-                  {order.sum.toLocaleString()}
+                  {order.sum ? order.sum.toLocaleString() : '0'}
                 </td>
               </tr>
             </tfoot>
           </table>
         </div>
-      ))}
+      )) : (
+        <div className="border mb-5 p-3 rounded-lg shadow-md bg-white text-center py-8">
+          <p className="text-gray-500 text-lg">ไม่พบประวัติการสั่งซื้อ</p>
+        </div>
+      )}
     </>
   )
 }

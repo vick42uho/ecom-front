@@ -214,7 +214,7 @@ export default function Order() {
           </tr>
         </thead>
         <tbody>
-          {orders.map((order) => (
+          {orders && orders.length > 0 ? orders.map((order) => (
             <tr key={order.id}>
               <td>{new Date(order.createdAt).toLocaleDateString()}</td>
               <td>{order.customerName}</td>
@@ -230,7 +230,13 @@ export default function Order() {
                 </button>
               </td>
             </tr>
-          ))}
+          )) : (
+            <tr>
+              <td colSpan={6} className="text-center py-8 text-gray-500">
+                ไม่พบรายการสั่งซื้อ
+              </td>
+            </tr>
+          )}
         </tbody>
       </table>
 
@@ -267,17 +273,25 @@ export default function Order() {
               </tr>
             </thead>
             <tbody>
-              {order?.OrderDetail.map((item) => (
-                <tr key={item.id}>
-                  <td>{item.Book.isbn}</td>
-                  <td>{item.Book.name}</td>
-                  <td className="text-right">{item.price}</td>
-                  <td className="text-right">{item.qty}</td>
-                  <td className="text-right">
-                    {(item.price * item.qty).toLocaleString()}
+              {!order?.OrderDetail || order.OrderDetail.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="text-center py-4 text-gray-500">
+                    ไม่พบรายการสินค้า
                   </td>
                 </tr>
-              ))}
+              ) : (
+                order.OrderDetail.map((item) => (
+                  <tr key={item.id}>
+                    <td>{item.Book.isbn}</td>
+                    <td>{item.Book.name}</td>
+                    <td className="text-right">{item.price}</td>
+                    <td className="text-right">{item.qty}</td>
+                    <td className="text-right">
+                      {(item.price * item.qty).toLocaleString()}
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
 
@@ -287,10 +301,12 @@ export default function Order() {
               ยอดรวม :
             </span>
             <span className="text-amber-300">
-              {order?.OrderDetail.reduce(
-                (total, item) => total + item.price * item.qty,
-                0
-              ).toLocaleString()}
+              {order?.OrderDetail && order.OrderDetail.length > 0 
+                ? order.OrderDetail.reduce(
+                    (total, item) => total + item.price * item.qty,
+                    0
+                  ).toLocaleString()
+                : "0"}
             </span>
             <span>บาท</span>
           </div>

@@ -143,7 +143,7 @@ export default function Home() {
         หนังสือในร้านเรา
       </h1>
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6">
-        {books.map((book: BookInterface) => (
+        {books && books.length > 0 ? books.map((book: BookInterface) => (
           <div
             key={book.id}
             className="bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1"
@@ -186,7 +186,11 @@ export default function Home() {
               )}
             </div>
           </div>
-        ))}
+        )) : (
+          <div className="col-span-full text-center py-8">
+            <p className="text-gray-500 text-lg">ไม่พบหนังสือในระบบ</p>
+          </div>
+        )}
       </div>
     </div>
   );
